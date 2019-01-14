@@ -24,7 +24,7 @@ TELEGRAM_USER_ID = int(os.environ['TELEGRAM_USER_ID'])
 bot = TelegramBot(TELEGRAM_BOT_APIKEY)
 bot.update_bot_info().wait()
 
-today = datetime.datetime.today()
+today = datetime.datetime.utcnow()
 
 
 def check_blog(blog):

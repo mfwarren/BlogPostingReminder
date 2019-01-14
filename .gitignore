@@ -1,0 +1,14 @@
+*.DS_Store*
+*.pyc
+.idea/
+venv/
+.coverage
+.vscode/
+.cache/
+
+# Sensitive environment files
+.env
+.envrc
+*.pem
+
+.pytest_cache/

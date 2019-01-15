@@ -10,11 +10,11 @@ from croniter import croniter
 from twx.botapi import TelegramBot
 
 SETTINGS = [
-    {'name': 'Fosterous', 'url': 'https://medium.com/feed/fosterous', 'schedule': '12 * * * mon'},
+    {'name': 'Fosterous', 'url': 'https://medium.com/feed/fosterous', 'schedule': '0 0 * * mon'},
     {
         'name': 'mattwarren.co',
         'url': 'http://feeds.feedburner.com/AllThingsOtis',
-        'schedule': '12 * * * mon',
+        'schedule': '0 0 * * mon',
     },
 ]
 TELEGRAM_BOT_APIKEY = os.environ['TELEGRAM_BOT_APIKEY']
@@ -51,6 +51,7 @@ def check_blog(blog):
 
     if next_post_expected_at < today:
         msg = f"{blog['name']} needs attention! last post {str((today-pubDate).days)} days ago."
+        print(msg)
         bot.send_message(TELEGRAM_USER_ID, msg).wait()
     else:
         msg = f"{blog['name']} is fresh! last post {str((today-pubDate).days)} days ago."

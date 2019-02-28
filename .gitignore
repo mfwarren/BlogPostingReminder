@@ -1,3 +1,5 @@
+schedule.json
+
 *.DS_Store*
 *.pyc
 .idea/

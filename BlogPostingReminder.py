@@ -3,20 +3,20 @@
 # https://mattwarren.co/
 
 import datetime
+import json
 import os
 
 import feedparser
 from croniter import croniter
 from twx.botapi import TelegramBot
 
-SETTINGS = [
-    {'name': 'Fosterous', 'url': 'https://medium.com/feed/fosterous', 'schedule': '0 0 * * mon'},
-    {
-        'name': 'mattwarren.co',
-        'url': 'http://feeds.feedburner.com/AllThingsOtis',
-        'schedule': '0 0 * * mon',
-    },
-]
+try:
+    with open('schedule.json') as json_file:
+        SETTINGS = json.load(json_file)
+except FileNotFoundError:
+    print('Missing schedule.json config file')
+    raise
+
 TELEGRAM_BOT_APIKEY = os.environ['TELEGRAM_BOT_APIKEY']
 TELEGRAM_USER_ID = int(os.environ['TELEGRAM_USER_ID'])
 

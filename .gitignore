@@ -12,5 +12,8 @@ venv/
 .env
 .envrc
 *.pem
+client_secret.json
+client_secrets.json
+saved_credentials.json
 
 .pytest_cache/

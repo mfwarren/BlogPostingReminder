@@ -9,9 +9,15 @@ import os
 import feedparser
 from croniter import croniter
 from twx.botapi import TelegramBot
+from pydrive.drive import GoogleDrive
+from pydrive.auth import GoogleAuth
+import dateutil.parser
+import pytz
+
+LOCAL = os.path.dirname(os.path.realpath(__file__))
 
 try:
-    with open('schedule.json') as json_file:
+    with open(os.path.join(LOCAL, 'schedule.json')) as json_file:
         SETTINGS = json.load(json_file)
 except FileNotFoundError:
     print('Missing schedule.json config file')
@@ -20,11 +26,15 @@ except FileNotFoundError:
 TELEGRAM_BOT_APIKEY = os.environ['TELEGRAM_BOT_APIKEY']
 TELEGRAM_USER_ID = int(os.environ['TELEGRAM_USER_ID'])
 
+gauth = GoogleAuth()
+gauth.LocalWebserverAuth()
+drive = GoogleDrive(gauth)
 
 bot = TelegramBot(TELEGRAM_BOT_APIKEY)
 bot.update_bot_info().wait()
 
 today = datetime.datetime.utcnow()
+today_tz = today.replace(tzinfo=pytz.utc)
 
 
 def check_blog(blog):
@@ -58,6 +68,26 @@ def check_blog(blog):
         print(msg)
 
 
+def check_gdrive(blog):
+    file2 = drive.CreateFile({'id': blog['gdrive-id']})
+    file2.FetchMetadata(fields='modifiedByMeDate')
+    pubDate = dateutil.parser.parse(file2['modifiedByMeDate'])
+
+    iter = croniter(blog['schedule'], pubDate)
+    next_post_expected_at = iter.get_next(datetime.datetime)
+
+    if next_post_expected_at < today_tz:
+        msg = f"{blog['name']} needs attention! last updated {str((today_tz-pubDate).days)} days ago."
+        print(msg)
+        bot.send_message(TELEGRAM_USER_ID, msg).wait()
+    else:
+        msg = f"{blog['name']} is fresh! last updated {str((today_tz-pubDate).days)} days ago."
+        print(msg)
+
+
 if __name__ == '__main__':
     for blog in SETTINGS:
-        check_blog(blog)
+        if 'gdrive-id' in blog:
+            check_gdrive(blog)
+        else:
+            check_blog(blog)
